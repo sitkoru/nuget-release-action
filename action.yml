@@ -1,0 +1,39 @@
+name: "sitkoru/nuget-release-action"
+description: "Action to release nuget packages"
+branding:
+  icon: "package"
+  color: "blue"
+
+inputs:
+  version:
+    description: "Package version"
+    required: true
+  project_path:
+    description: "Path to .csproj"
+    required: true
+  pack_args:
+    description: "Additional arguments to pack command (Optional)"
+    required: false
+  nuget_host:
+    description: "Nuget source url"
+    required: false
+  nuget_token:
+    description: "Nuget source token"
+    required: false
+
+runs:
+  using: "composite"
+  steps:
+    - uses: actions/setup-dotnet@v1
+      name: Authenticate nuget source
+      if: ${{ inputs.nuget_host != '' }} 
+      with:
+        source-url: ${{ inputs.nuget_host }}
+      env:
+        NUGET_AUTH_TOKEN: ${{ inputs.nuget_token }}
+    - name: Pack gRPC library
+      run: dotnet pack ${{ inputs.project_path }} -c Release /p:Version=${{ inputs.version }} -o packages ${{ inputs.pack_args }}
+      shell: bash
+    - name: Publish nuget package
+      run: dotnet nuget push packages/*.nupkg --skip-duplicate -k ${{ inputs.nuget_token }} -s ${{ inputs.nuget_host }}
+      shell: bash
