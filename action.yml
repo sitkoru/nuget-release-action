@@ -32,7 +32,9 @@ runs:
       env:
         NUGET_AUTH_TOKEN: ${{ inputs.nuget_token }}
     - name: Pack gRPC library
-      run: dotnet pack ${{ inputs.project_path }} -c Release /p:Version=${{ inputs.version }} -o packages ${{ inputs.pack_args }}
+      run: |
+        rm -rf packages/*
+        dotnet pack ${{ inputs.project_path }} -c Release /p:Version=${{ inputs.version }} -o packages ${{ inputs.pack_args }}
       shell: bash
     - name: Publish nuget package
       run: dotnet nuget push packages/*.nupkg --skip-duplicate -k ${{ inputs.nuget_token }} -s ${{ inputs.nuget_host }}
