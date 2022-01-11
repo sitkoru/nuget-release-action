@@ -23,10 +23,11 @@ jobs:
         run: |
           VERSION=${GITHUB_REF#refs/tags/}
           echo ::set-output name=version::${VERSION}
-      - name: Build
+      - name: Pubish
         uses: sitkoru/nuget-release-action@v1
         with:
           version: ${{ steps.prep.outputs.version }}
+          project_path: src/PROJECT/PROJECT.csproj
           nuget_host: ${{ secrets.NUGET_HOST }}
           nuget_token: ${{ secrets.BOT_TOKEN }}
 ```
